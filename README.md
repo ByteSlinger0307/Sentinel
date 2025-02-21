@@ -28,7 +28,7 @@
 ### 📌 Clone the Repo  
 ```bash
 git clone https://github.com/your-repo/sentinel-ai.git
-cd sentinel-ai
+cd sentinel
 ```  
 
 ### 📌 Install Dependencies  
