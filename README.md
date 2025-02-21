@@ -27,7 +27,7 @@
 
 ### 📌 Clone the Repo  
 ```bash
-git clone https://github.com/your-repo/sentinel-ai.git
+git clone https://github.com/your-repo/sentinel.git
 cd sentinel
 ```  
 
