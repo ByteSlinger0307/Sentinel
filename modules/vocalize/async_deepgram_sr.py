@@ -1,5 +1,13 @@
 import asyncio
 import os
+import sys
+
+try:
+    from modules.sqlqueue import SqlQueue
+except ModuleNotFoundError:
+    sys.path.append(os.path.dirname(__file__) + "/../../")
+    from modules.sqlqueue import SqlQueue
+
 
 from dotenv import load_dotenv
 
@@ -8,15 +16,20 @@ from deepgram import (
     DeepgramClientOptions,
     LiveTranscriptionEvents,
     LiveOptions,
-    Microphone,
+    Microphone
 )
-from rich import print
 
 load_dotenv()
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY", None)
 DEEPGRAM_MODEL = os.getenv("DEEPGRAM_MODEL", "nova-2")
 SPEECHRECOGNITION_LANGUAGE = os.getenv("SPEECHRECOGNITION_LANGUAGE", "en-US")
+TMP_DIR = os.getenv("TMP_DIR", "/tmp")
+
+if not os.path.exists(TMP_DIR):
+    os.makedirs(TMP_DIR)
+
+Queue = SqlQueue(os.path.join(TMP_DIR, "async_deepgram_sr.queue.db"))
 
 if DEEPGRAM_API_KEY is None:
     raise Exception("Please set the DEEPGRAM_API_KEY environment variable")
@@ -39,7 +52,6 @@ transcript_collector = TranscriptCollector()
 
 
 
-print(f"Using API key: {DEEPGRAM_API_KEY}")
 
 
 
@@ -50,6 +62,7 @@ async def get_transcript():
         deepgram: DeepgramClient = DeepgramClient(DEEPGRAM_API_KEY, config)
 
         dg_connection = deepgram.listen.asyncwebsocket.v("1")
+
 
         async def on_message(self, result, **kwargs):
             sentence = result.channel.alternatives[0].transcript
@@ -63,6 +76,9 @@ async def get_transcript():
                 transcript_collector.add_part(sentence)
                 full_sentence = transcript_collector.get_full_transcript()
                 print(f"speaker: {full_sentence}")
+                string = full_sentence.strip()
+                if string:
+                    Queue.put(string)
                 # Reset the collector for the next sentence
                 transcript_collector.reset()
 
