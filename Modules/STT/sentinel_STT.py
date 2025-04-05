@@ -39,6 +39,7 @@ transcript_collector = TranscriptCollector()
 
 
 
+print(f"Using API key: {DEEPGRAM_API_KEY}")
 
 
 
@@ -48,7 +49,7 @@ async def get_transcript():
         config = DeepgramClientOptions(api_key=DEEPGRAM_API_KEY, options={"keepalive": "true"})
         deepgram: DeepgramClient = DeepgramClient(DEEPGRAM_API_KEY, config)
 
-        dg_connection = deepgram.listen.asynclive.v("1")
+        dg_connection = deepgram.listen.asyncwebsocket.v("1")
 
         async def on_message(self, result, **kwargs):
             sentence = result.channel.alternatives[0].transcript
