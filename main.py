@@ -1,22 +1,6 @@
-# capture audio with microphone
-# process audio [...]
-# convert audio to text
+from modules.llm._groq import Groq, LLAMA_31_70B_VERSATILE, LLAMA_32_11B_VISION_PREVIEW, Role
+from rich import print
 
-# capture audio with microphone
+llm = Groq(LLAMA_32_11B_VISION_PREVIEW)
 
-# 
-
-from modules.sqlqueue import SqlQueue
-
-
-import os
-
-db_path = r"D:\SentientLabs\Sentinel S0\data\tmp\async_deepgram_sr.queue.db"
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
-
-voicedata = SqlQueue(db_path)
-
-
-
-while True:
-    print(voicedata.get())
+print(llm.run("hello"))
